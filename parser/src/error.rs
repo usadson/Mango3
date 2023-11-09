@@ -16,4 +16,10 @@ pub struct ParseError {
 pub enum ParseErrorKind {
     #[error("expected article determinator")]
     ExpectedArticleDeterminator,
+
+    #[error("expected substantive, was unknown word")]
+    ExpectedSubstantiveWasUnknownWord,
+
+    #[error("expected substantive, was not")]
+    ExpectedSubstantiveWasNot,
 }

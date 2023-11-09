@@ -23,10 +23,12 @@ impl<'i> Input<'i> {
     }
 
     pub fn consume_until_space(&mut self) -> (&'i str, Range) {
+        log::info!("Currently: {:#?}", self);
         self.with_offset_tracking(|this| {
             if let Some(idx) = this.data.find(char::is_whitespace) {
                 let ret = &this.data[0..idx];
                 this.data = &this.data[idx..];
+                this.trim_start();
                 ret
             } else {
                 let ret = this.data;
@@ -57,6 +59,18 @@ impl<'i> Input<'i> {
         self.offset += len - self.data.len();
 
         (ret, Range::new(orig_offset, self.offset))
+    }
+
+    pub fn attempt<Ret, F>(&mut self, f: F) -> ParseResult<Ret>
+            where F: FnOnce(&mut Self) -> ParseResult<Ret> {
+        let restore = *self;
+        let ret = f(self);
+
+        if !ret.is_ok() {
+            *self = restore;
+        }
+
+        ret
     }
 }
 

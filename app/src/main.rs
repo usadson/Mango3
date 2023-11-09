@@ -2,16 +2,18 @@
 // All Rights Reserved.
 
 use log::info;
-use mango3_parser::{Input, parse_determinator};
+use mango3_catalog::Catalog;
+use mango3_parser::*;
 
 fn main() {
     env_logger::Builder::from_env(
         env_logger::Env::default().default_filter_or("trace")
     ).init();
 
-    let input = " De wijze man ";
+    let catalog = Catalog::new();
 
+    let input = " De vrouwen ";
     let mut input = Input::new(input);
 
-    info!("Determinator: {:#?}", parse_determinator(&mut input));
+    info!("Result: {:#?}", parse_noun_constituent(&mut input, &catalog));
 }
