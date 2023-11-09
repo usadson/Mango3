@@ -1,0 +1,10 @@
+[package]
+name = "mango3-parser"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+log = "*"
+thiserror = "*"
+
+mango3-syntax = { path = "../syntax" }

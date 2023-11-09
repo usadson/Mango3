@@ -1,0 +1,11 @@
+bin/
+obj/
+/packages/
+target/
+*.exe
+*.dll
+*.out
+*.dylib
+*.rdylib
+*.rlib
+*.lib

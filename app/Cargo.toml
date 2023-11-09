@@ -1,0 +1,11 @@
+[package]
+name = "mango3"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+mango3-parser = { path = "../parser" }
+mango3-syntax = { path = "../syntax" }
+
+env_logger = "*"
+log = "*"
