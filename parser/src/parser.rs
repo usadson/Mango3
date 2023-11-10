@@ -6,7 +6,7 @@ use mango3_syntax::{
     Article,
     AtomicDeterminator,
     Determinator,
-    Substantive, NounConstituent, NounConstituentCore,
+    Substantive, NounConstituent, NounConstituentCore, Range,
 };
 
 use crate::{
@@ -35,13 +35,21 @@ pub fn parse_determinator(input: &mut Input<'_>) -> ParseResult<Determinator> {
 }
 
 pub fn parse_noun_constituent(input: &mut Input<'_>, catalog: &Catalog) -> ParseResult<NounConstituent> {
+    let start = input.offset();
     let determinator = input.attempt(parse_determinator).ok();
+    let core = NounConstituentCore::Substantive(
+        parse_substantive(input, catalog)?
+    );
+
+    let range = Range {
+        start,
+        end: input.offset()
+    };
 
     Ok(NounConstituent {
         determinator,
-        core: NounConstituentCore::Substantive(
-            parse_substantive(input, catalog)?
-        )
+        core,
+        range,
     })
 }
 

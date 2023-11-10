@@ -2,7 +2,7 @@
 // All Rights Reserved.
 
 use mango3_catalog::Catalog;
-use mango3_syntax::{NounConstituent, Sentence, SentenceKind, Range, NounConstituentCore};
+use mango3_syntax::{NounConstituent, Sentence, SentenceKind, NounConstituentCore};
 
 use crate::{AnalysisSink, Analyzer, GenderAnalyzer};
 
@@ -43,10 +43,7 @@ impl DeterminatorValidator {
 
         if !determinator_genders.matches(core_genders) {
             sink.report(
-                Range {
-                    start: 0,
-                    end: 0,
-                },
+                noun.range,
                 "noun-constituent.determinator",
                 vec![
                     ("core.genders", serde_json::to_string(&core_genders).unwrap()),
