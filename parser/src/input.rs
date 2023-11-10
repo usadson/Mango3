@@ -3,7 +3,8 @@
 
 use crate::{
     ParseError,
-    ParseErrorKind, ParseResult,
+    ParseErrorKind,
+    ParseResult,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -23,16 +24,16 @@ impl<'i> Input<'i> {
     }
 
     pub fn consume_until_space(&mut self) -> (&'i str, Range) {
+        self.trim_start();
         log::info!("Currently: {:#?}", self);
         self.with_offset_tracking(|this| {
             if let Some(idx) = this.data.find(char::is_whitespace) {
                 let ret = &this.data[0..idx];
                 this.data = &this.data[idx..];
-                this.trim_start();
                 ret
             } else {
                 let ret = this.data;
-                let end = this.data.len() - 1;
+                let end = this.data.len();
                 this.data = &this.data[end..];
                 ret
             }

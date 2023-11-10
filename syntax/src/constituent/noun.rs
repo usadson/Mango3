@@ -1,7 +1,7 @@
 // Copyright (C) 2023 Tristan Gerritsen <tristan@thewoosh.org>
 // All Rights Reserved.
 
-use crate::{Substantive, Determinator, Range};
+use crate::{Substantive, Determinator, Range, Ranged};
 
 /// The noun constituent is a noun with optional helper words surrounding it.
 ///
@@ -10,8 +10,8 @@ use crate::{Substantive, Determinator, Range};
 #[derive(Debug, Clone)]
 pub struct NounConstituent {
     pub range: Range,
-    pub determinator: Option<Determinator>,
-    pub core: NounConstituentCore,
+    pub determinator: Option<Ranged<Determinator>>,
+    pub core: Ranged<NounConstituentCore>,
 }
 
 #[derive(Debug, Clone)]

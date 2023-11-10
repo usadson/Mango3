@@ -35,7 +35,8 @@ impl DeterminatorValidator {
         let determinator_genders = determinator.analyze_gender(catalog);
         let core_genders = noun.core.analyze_gender(catalog);
 
-        let core = match &noun.core {
+        let secondary_ranges = vec![noun.core.range()];
+        let core = match noun.core.as_ref() {
             NounConstituentCore::Substantive(substantive) => {
                 catalog.get(&substantive.catalog_index).text.to_string()
             }
@@ -43,7 +44,8 @@ impl DeterminatorValidator {
 
         if !determinator_genders.matches(core_genders) {
             sink.report(
-                noun.range,
+                determinator.range(),
+                secondary_ranges,
                 "noun-constituent.determinator",
                 vec![
                     ("core.genders", serde_json::to_string(&core_genders).unwrap()),

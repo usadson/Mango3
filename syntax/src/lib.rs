@@ -16,7 +16,7 @@ pub use self::{
     constituent::*,
     document::*,
     determinator::*,
-    range::Range,
+    range::*,
     sentence::*,
     substantive::*,
 };

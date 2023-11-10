@@ -65,6 +65,10 @@
                     if (handler) {
                         const formatted = handler(report);
                         markRangeIncorrect(report.range, formatted.message);
+
+                        for (const secondaryRange of report.secondary_ranges) {
+                            markRangeSecondary(secondaryRange);
+                        }
                         // output.textContent += handler(report).message;
                     } else {
                         // output.textContent += "\n" + JSON.stringify(response, null, '    ');
@@ -102,6 +106,21 @@
                 idx += 1;
             } while (idx < range.end);
         }
+
+        function markRangeSecondary(range) {
+            let idx = range.start;
+
+            do {
+                let char = document.querySelector(`.idx-${idx}`);
+                if (char == null) {
+                    break;
+                }
+
+                char.classList.add("secondary-range");
+
+                idx += 1;
+            } while (idx < range.end);
+        }
     </script>
     <style>
         html {
@@ -112,6 +131,12 @@
             text-decoration-line: underline;
             text-decoration-style: wavy;
             text-decoration-color: red;
+        }
+
+        .secondary-range {
+            text-decoration-line: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: blue;
         }
 
         .report {
