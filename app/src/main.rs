@@ -3,17 +3,21 @@
 
 use log::info;
 use mango3_catalog::Catalog;
-use mango3_parser::*;
+use mango3_parser::{
+    Input,
+    parse_document,
+};
 
 fn main() {
     env_logger::Builder::from_env(
         env_logger::Env::default().default_filter_or("trace")
     ).init();
 
-    let catalog = Catalog::new();
+    let catalog = &Catalog::new();
 
     let input = " De vrouwen ";
-    let mut input = Input::new(input);
+    let input = &mut Input::new(input);
+    let document = parse_document(input, catalog);
 
-    info!("Result: {:#?}", parse_noun_constituent(&mut input, &catalog));
+    info!("Result: {document:#?}");
 }

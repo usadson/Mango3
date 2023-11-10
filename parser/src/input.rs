@@ -39,6 +39,14 @@ impl<'i> Input<'i> {
         })
     }
 
+    pub fn has_next(&self) -> bool {
+        self.data.trim().is_empty()
+    }
+
+    pub const fn offset(&self) -> usize {
+        self.offset
+    }
+
     pub fn trim_start(&mut self) {
         self.with_offset_tracking(|t| {
             t.data = t.data.trim_start();

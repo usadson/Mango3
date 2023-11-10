@@ -7,13 +7,13 @@ use crate::{Substantive, Determinator};
 ///
 /// ## References
 /// * [ANS - Naamwoordelijke Constituent](https://e-ans.ivdnt.org/topics/pid/ans1401lingtopic)
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NounConstituent {
     pub determinator: Option<Determinator>,
     pub core: NounConstituentCore,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum NounConstituentCore {
     Substantive(Substantive),
 }

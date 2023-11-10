@@ -2,8 +2,10 @@
 // All Rights Reserved.
 
 mod constituent;
-mod substantive;
+mod document;
 mod determinator;
+mod sentence;
+mod substantive;
 
 use std::rc::Rc;
 
@@ -11,6 +13,8 @@ pub type Shared<T> = Rc<T>;
 
 pub use self::{
     constituent::*,
+    document::*,
     determinator::*,
+    sentence::*,
     substantive::*,
 };

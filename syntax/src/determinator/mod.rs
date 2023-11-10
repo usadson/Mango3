@@ -5,7 +5,7 @@ mod atomic;
 
 pub use self::atomic::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Determinator {
     Atomic(AtomicDeterminator),
 }
