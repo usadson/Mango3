@@ -1,14 +1,11 @@
 // Copyright (C) 2023 Tristan Gerritsen <tristan@thewoosh.org>
 // All Rights Reserved.
 
-use std::{
-    collections::HashMap,
-    sync::Arc,
-};
+use std::{collections::HashMap, sync::Arc};
 
 use unicase::Ascii;
 
-use crate::{Word, WordTrait, Gender, Multiplicity};
+use crate::{Gender, Multiplicity, Word, WordTrait};
 
 #[derive(Debug, Clone)]
 pub struct Catalog {
@@ -25,6 +22,10 @@ impl Catalog {
     pub fn find<'a>(&'a self, word: &'a str) -> Option<(CatalogIndex, &'a Word)> {
         let idx = self.data.map.get(&Ascii::new(word))?;
         Some((idx.clone(), &self.data.definitions[idx.0]))
+    }
+
+    pub fn get(&self, index: &CatalogIndex) -> &Word {
+        &self.data.definitions[index.0]
     }
 }
 

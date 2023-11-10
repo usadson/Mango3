@@ -1,13 +1,11 @@
 [package]
-name = "mango3"
+name = "mango3-analysis"
 edition = "2021"
 version = "0.1.0"
 
 [dependencies]
-mango3-analysis = { path = "../analysis" }
-mango3-catalog = { path = "../catalog" }
-mango3-parser = { path = "../parser" }
-mango3-syntax = { path = "../syntax" }
-
-env_logger = "*"
 log = "*"
+rayon = "*"
+
+mango3-catalog = { path = "../catalog" }
+mango3-syntax = { path = "../syntax" }

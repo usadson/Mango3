@@ -15,9 +15,11 @@ fn main() {
 
     let catalog = &Catalog::new();
 
-    let input = " De vrouwen ";
+    let input = " Het vrouwen ";
     let input = &mut Input::new(input);
     let document = parse_document(input, catalog);
 
     info!("Result: {document:#?}");
+
+    mango3_analysis::analyze(&document, catalog);
 }

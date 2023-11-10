@@ -9,3 +9,6 @@ target/
 *.rdylib
 *.rlib
 *.lib
+
+.idea/
+.vscode/

@@ -40,7 +40,7 @@ impl<'i> Input<'i> {
     }
 
     pub fn has_next(&self) -> bool {
-        self.data.trim().is_empty()
+        !self.data.trim().is_empty()
     }
 
     pub const fn offset(&self) -> usize {
