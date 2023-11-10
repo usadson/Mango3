@@ -5,6 +5,7 @@ use mango3_catalog::{Catalog, Gender, WordTrait};
 use mango3_syntax::{Article, AtomicDeterminator, Determinator, NounConstituentCore, Substantive};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(serde::Serialize)]
 pub struct GenderAnalysis {
     pub feminine: bool,
     pub neuter: bool,

@@ -1,0 +1,18 @@
+[package]
+name = "mango3-web"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+mango3-analysis = { path = "../analysis" }
+mango3-catalog = { path = "../catalog" }
+mango3-parser = { path = "../parser" }
+mango3-syntax = { path = "../syntax" }
+
+axum = "*"
+env_logger = "*"
+log = "*"
+serde = { version = "*", features = ["derive"] }
+tokio = { version = "*", features = ["full"] }
+tower = { version = "*", features = ["make"] }
+tower-http = { version = "*", features = ["fs"] }

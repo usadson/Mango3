@@ -4,4 +4,6 @@ edition = "2021"
 version = "0.1.0"
 
 [dependencies]
+serde = { version = "*", features = ["derive"] }
+
 mango3-catalog = { path = "../catalog" }

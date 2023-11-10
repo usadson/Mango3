@@ -2,7 +2,7 @@
 // All Rights Reserved.
 
 use mango3_catalog::Catalog;
-use mango3_syntax::{NounConstituent, Sentence, SentenceKind};
+use mango3_syntax::{NounConstituent, Sentence, SentenceKind, Range, NounConstituentCore};
 
 use crate::{AnalysisSink, Analyzer, GenderAnalyzer};
 
@@ -35,9 +35,25 @@ impl DeterminatorValidator {
         let determinator_genders = determinator.analyze_gender(catalog);
         let core_genders = noun.core.analyze_gender(catalog);
 
+        let core = match &noun.core {
+            NounConstituentCore::Substantive(substantive) => {
+                catalog.get(&substantive.catalog_index).text.to_string()
+            }
+        };
+
         if !determinator_genders.matches(core_genders) {
-            _ = sink;
-            log::warn!("Genders don't match: {noun:#?}");
+            sink.report(
+                Range {
+                    start: 0,
+                    end: 0,
+                },
+                "noun-constituent.determinator",
+                vec![
+                    ("core.genders", serde_json::to_string(&core_genders).unwrap()),
+                    ("determinator.genders", serde_json::to_string(&determinator_genders).unwrap()),
+                    ("core", core),
+                ],
+            );
         }
     }
 }

@@ -4,6 +4,7 @@
 mod constituent;
 mod document;
 mod determinator;
+mod range;
 mod sentence;
 mod substantive;
 
@@ -15,6 +16,7 @@ pub use self::{
     constituent::*,
     document::*,
     determinator::*,
+    range::Range,
     sentence::*,
     substantive::*,
 };

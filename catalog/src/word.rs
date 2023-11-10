@@ -16,6 +16,7 @@ pub enum Multiplicity {
 
 #[derive(Debug)]
 pub struct Word {
+    pub text: &'static str,
     pub traits: Vec<WordTrait>,
 }
 

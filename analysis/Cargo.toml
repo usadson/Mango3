@@ -6,6 +6,8 @@ version = "0.1.0"
 [dependencies]
 log = "*"
 rayon = "*"
+serde = { version = "*", features = ["derive"] }
+serde_json = "*"
 
 mango3-catalog = { path = "../catalog" }
 mango3-syntax = { path = "../syntax" }

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mango3</title>
+    <script defer src="analyses.js"></script>
+</head>
+<body>
+    <h1>Mango3</h1>
+    <textarea>
+
+    </textarea>
+    <br>
+    <output>
+
+    </output>
+
+    <script>
+        var timer;
+
+        const textarea = document.querySelector("textarea");
+        const output = document.querySelector("output");
+
+        if (textarea.value !== "") {
+            runAnalysis();
+        }
+
+        textarea.onkeyup = (event) => {
+            clearTimeout(timer);
+            typingTimer = setTimeout(runAnalysis, 1000);
+        };
+
+        textarea.onkeydown = (event) => {
+            clearTimeout(timer);
+        };
+
+        function runAnalysis() {
+            const text = textarea.value;
+            fetch('/api/v1/analyze', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                }),
+            })
+            .then(response => response.json())
+            .then(response => {
+                output.innerHTML = "";
+
+                for (let i = 0; i < text.length; ++i) {
+                    output.innerHTML += `<span class="idx-${i}">${text[i]}</span>`;
+                }
+
+                for (const report of response.analysis) {
+                    const handler = REPORTS[report.kind];
+                    report.values = report.values.reduce((acc, val) => {
+                        acc[val[0]] = val[1];
+                        return acc;
+                    }, {});
+                    console.dir(report);
+                    if (handler) {
+                        const formatted = handler(report);
+                        markRangeIncorrect(report.range, formatted.message);
+                        // output.textContent += handler(report).message;
+                    } else {
+                        // output.textContent += "\n" + JSON.stringify(response, null, '    ');
+                    }
+                }
+            });
+        }
+
+        function markRangeIncorrect(range, message) {
+            let idx = range.start;
+
+            const id = `report-${Date.now().valueOf()}-${Math.ceil(Math.random() * 10000)}`;
+            output.innerHTML += `<div class="report hidden" id="${id}">${message}</div>`;
+
+            do {
+                let char = document.querySelector(`.idx-${idx}`);
+                if (char == null) {
+                    break;
+                }
+
+                char.classList.add("incorrect-char");
+                char.addEventListener("mousemove", (event) => {
+                    console.dir(event);
+                    const el = document.querySelector(`#${id}`);
+                    el.style.left = `${event.clientX}px`;
+                    el.style.top = `${event.clientY}px`;
+                    el.classList.remove("hidden");
+                });
+
+                char.addEventListener("mouseleave", (event) => {
+                    const el = document.querySelector(`#${id}`);
+                    el.classList.add("hidden");
+                });
+
+                idx += 1;
+            } while (idx < range.end);
+        }
+    </script>
+    <style>
+        html {
+            font-family: sans-serif;
+        }
+
+        .incorrect-char {
+            text-decoration-line: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: red;
+        }
+
+        .report {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            background-color: white;
+            margin: 1rem;
+            padding: .7rem;
+            display: inline;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        output {
+            margin-top: 1rem;
+            padding: .5rem;
+            border: 1px solid black;
+            background-color: #F0F0F0;
+            display: block;
+            width: max-content;
+        }
+
+        output:empty {
+            border: none !important;
+        }
+
+    </style>
+</body>
+</html>

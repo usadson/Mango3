@@ -50,6 +50,7 @@ impl CatalogData {
         let idx = self.map.entry(Ascii::new(word))
             .or_insert_with(|| {
                 self.definitions.push(Word {
+                    text: word,
                     traits: Default::default(),
                 });
                 CatalogIndex(self.definitions.len() - 1)
