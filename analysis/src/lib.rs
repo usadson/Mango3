@@ -12,7 +12,14 @@ use rayon::prelude::*;
 pub(crate) use self::{gender::GenderAnalyzer, noun_constituent::*};
 
 pub trait AnalysisSink {
-    fn report(&mut self, range: Range, secondary_ranges: Vec<Range>, kind: &'static str, values: Vec<(&'static str, String)>);
+    fn report(
+        &mut self,
+        range: Range,
+        secondary_ranges: Vec<Range>,
+        kind: &'static str,
+        values: Vec<(&'static str, String)>,
+        replacements: Vec<(Range, String)>,
+    );
 }
 
 pub trait Analyzer {
@@ -26,6 +33,7 @@ pub struct Report {
     secondary_ranges: Vec<Range>,
     kind: &'static str,
     values: Vec<(&'static str, String)>,
+    replacements: Vec<(Range, String)>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -34,12 +42,20 @@ struct SimpleSink {
 }
 
 impl AnalysisSink for SimpleSink {
-    fn report(&mut self, range: Range, secondary_ranges: Vec<Range>, kind: &'static str, values: Vec<(&'static str, String)>) {
+    fn report(
+        &mut self,
+        range: Range,
+        secondary_ranges: Vec<Range>,
+        kind: &'static str,
+        values: Vec<(&'static str, String)>,
+        replacements: Vec<(Range, String)>,
+    ) {
         self.data.push(Report {
             range,
             secondary_ranges,
             kind,
             values,
+            replacements,
         });
     }
 }

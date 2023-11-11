@@ -46,6 +46,7 @@ impl DeterminatorValidator {
                     secondary_ranges,
                     "noun-constituent.determinator.plurality",
                     vec![("core", core)],
+                    vec![],
                 );
             }
 
@@ -76,6 +77,7 @@ impl DeterminatorValidator {
                     ("determinator.genders", serde_json::to_string(&determinator_genders).unwrap()),
                     ("core", core),
                 ],
+                vec![],
             );
         }
     }
