@@ -6,6 +6,13 @@ const REPORTS = {
         return {
             "message": `Bij het substantief <i>${sub}</i> hoort het lidwoord <b>${article}</b>.`,
         }
+    },
+    "noun-constituent.determinator.plurality": function(report) {
+        const sub = encodeURI(report.values.core);
+        console.dir(report);
+        return {
+            "message": `De determinator bij <i>${sub}</i> is onjuist, gebruik <b>?</b>.`,
+        }
     }
 };
 

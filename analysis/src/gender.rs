@@ -19,6 +19,12 @@ impl GenderAnalysis {
         masculine: false,
     };
 
+    pub const FEMININE_AND_MASCULINE: Self = Self {
+        feminine: true,
+        neuter: false,
+        masculine: true,
+    };
+
     pub const NEUTER: Self = Self {
         feminine: false,
         neuter: true,
@@ -62,7 +68,7 @@ pub(crate) trait GenderAnalyzer {
 impl GenderAnalyzer for Article {
     fn analyze_gender(&self, _: &Catalog) -> GenderAnalysis {
         match self {
-            Self::De => GenderAnalysis::ALL,
+            Self::De => GenderAnalysis::FEMININE_AND_MASCULINE,
             Self::Een => GenderAnalysis::ALL,
             Self::Het => GenderAnalysis::NEUTER,
         }
