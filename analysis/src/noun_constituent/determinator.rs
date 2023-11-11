@@ -46,7 +46,9 @@ impl DeterminatorValidator {
                     secondary_ranges,
                     "noun-constituent.determinator.plurality",
                     vec![("core", core)],
-                    vec![],
+                    vec![
+                        (determinator.range(), determinator.to_plural_form()),
+                    ],
                 );
             }
 

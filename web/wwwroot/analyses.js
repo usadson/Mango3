@@ -11,7 +11,7 @@ const REPORTS = {
         const sub = encodeURI(report.values.core);
         console.dir(report);
         return {
-            "message": `De determinator bij <i>${sub}</i> is onjuist, gebruik <b>?</b>.`,
+            "message": `De determinator bij <i>${sub}</i> is onjuist, gebruik <b>${report.replacements[0][1]}</b>.`,
         }
     }
 };
