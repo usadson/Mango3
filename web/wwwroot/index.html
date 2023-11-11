@@ -28,7 +28,7 @@
 
         textarea.onkeyup = (event) => {
             clearTimeout(timer);
-            typingTimer = setTimeout(runAnalysis, 1000);
+            timer = setTimeout(runAnalysis, 1000);
         };
 
         textarea.onkeydown = (event) => {
