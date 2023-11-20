@@ -60,44 +60,32 @@ impl CatalogData {
     }
 
     fn fill_with_test_data(&mut self) {
-        self.add("man").traits.push(
+        self.add_noun("man", "mannen", Gender::Masculine);
+        self.add_noun("vrouw", "vrouwen", Gender::Feminine);
+        self.add_noun("kind", "kinderen", Gender::Neuter);
+        self.add_noun("meisje", "meisjes", Gender::Neuter);
+        self.add_noun("meid", "meiden", Gender::Feminine);
+        self.add_noun("jongen", "jongens", Gender::Masculine);
+        self.add_noun("water", "wateren", Gender::Neuter);
+    }
+
+    fn add_noun(
+        &mut self,
+        singular: &'static str,
+        plural: &'static str,
+        gender: Gender,
+    ) {
+
+        self.add(singular).traits.push(
             WordTrait::Noun {
-                gender: Gender::Masculine,
+                gender,
                 multiplicity: Multiplicity::Singular,
             }
         );
 
-        self.add("mannen").traits.push(
+        self.add(plural).traits.push(
             WordTrait::Noun {
-                gender: Gender::Masculine,
-                multiplicity: Multiplicity::Plural,
-            }
-        );
-
-        self.add("vrouw").traits.push(
-            WordTrait::Noun {
-                gender: Gender::Feminine,
-                multiplicity: Multiplicity::Singular,
-            }
-        );
-
-        self.add("vrouwen").traits.push(
-            WordTrait::Noun {
-                gender: Gender::Feminine,
-                multiplicity: Multiplicity::Plural,
-            }
-        );
-
-        self.add("kind").traits.push(
-            WordTrait::Noun {
-                gender: Gender::Neuter,
-                multiplicity: Multiplicity::Singular,
-            }
-        );
-
-        self.add("kinderen").traits.push(
-            WordTrait::Noun {
-                gender: Gender::Neuter,
+                gender,
                 multiplicity: Multiplicity::Plural,
             }
         );
