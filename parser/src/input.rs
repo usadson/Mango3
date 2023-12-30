@@ -10,6 +10,7 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Input<'i> {
     offset: usize,
+    original_str: &'i str,
     data: &'i str,
 }
 
@@ -17,10 +18,15 @@ impl<'i> Input<'i> {
     pub fn new(data: &'i str) -> Self {
         let mut this = Self {
             offset: 0,
+            original_str: data,
             data,
         };
         this.trim_start();
         this
+    }
+
+    pub const fn original_str(&self) -> &'i str {
+        self.original_str
     }
 
     pub fn consume_until_space(&mut self) -> (&'i str, Range) {

@@ -1,9 +1,18 @@
 // Copyright (C) 2023 Tristan Gerritsen <tristan@thewoosh.org>
 // All Rights Reserved.
 
+use std::time::Instant;
+
 use axum::{
-    extract::State, handler::HandlerWithoutStateExt, http::StatusCode, routing::*, Json, Router,
+    extract::State,
+    handler::HandlerWithoutStateExt,
+    http::{StatusCode, HeaderMap},
+    routing::*,
+    Json,
+    Router,
+    response::IntoResponse,
 };
+
 use mango3_analysis::Report;
 use mango3_catalog::Catalog;
 use mango3_parser::{parse_document, Input};
@@ -17,6 +26,8 @@ struct AppState {
 
 #[tokio::main]
 async fn main() {
+    println!("Mango3 is loading...");
+
     env_logger::Builder::from_env(
         env_logger::Env::default().default_filter_or("trace")
     ).init();
@@ -34,7 +45,11 @@ async fn main() {
         .fallback_service(fallback_service)
         .with_state(state);
 
-    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+    let address = "0.0.0.0:8080";
+
+    println!("Listening on {address}");
+
+    axum::Server::bind(&address.parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
@@ -53,11 +68,22 @@ struct AnalyzeResponsePayload {
 async fn api_analyze(
     State(state): State<AppState>,
     Json(payload): Json<AnalyzeRequestPayload>,
-) -> Json<AnalyzeResponsePayload> {
+) -> impl IntoResponse {
+    let start = Instant::now();
+
     let input = &mut Input::new(&payload.text);
     let document = parse_document(input, &state.catalog);
+
+    let parse_time = start.elapsed().as_millis();
+    let start = Instant::now();
+
     let analysis = mango3_analysis::analyze(&document, &state.catalog);
-    Json(AnalyzeResponsePayload { analysis })
+    let analysis_time = start.elapsed().as_millis();
+
+    let mut headers = HeaderMap::new();
+    headers.append("Server-Timing", format!("parse;dur={parse_time}, analysis;dur={analysis_time}").try_into().unwrap());
+
+    (headers, Json(AnalyzeResponsePayload { analysis }))
 }
 
 async fn handle_404() -> (StatusCode, &'static str) {

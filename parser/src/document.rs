@@ -19,6 +19,8 @@ pub fn parse_document(input: &mut Input<'_>, catalog: &Catalog) -> Document {
             Ok(sentence) => doc.sentences_mut().push(sentence),
             Err(e) => {
                 log::warn!("Failed to parse sentence: {}: {e:#?}", e.kind);
+                log::warn!("  {}", input.original_str());
+                log::warn!("  {}{} {}", " ".repeat(e.range.start), "^".repeat(e.range.end - e.range.start), e.kind);
 
                 if input.offset() == starting_offset {
                     log::error!("Failed to parse sentence, cannot advance.");

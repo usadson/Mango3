@@ -1,94 +1,90 @@
 // Copyright (C) 2023 Tristan Gerritsen <tristan@thewoosh.org>
 // All Rights Reserved.
 
-use std::{collections::HashMap, sync::Arc};
-
-use unicase::Ascii;
+use std::sync::Mutex;
+use std::sync::Arc;
+use std::error::Error;
 
 use crate::{Gender, Multiplicity, Word, WordTrait};
 
 #[derive(Debug, Clone)]
 pub struct Catalog {
-    data: Arc<CatalogData>,
+    data: Arc<Mutex<CatalogData>>,
 }
 
 impl Catalog {
     pub fn new() -> Self {
         Self {
-            data: Arc::new(CatalogData::new()),
+            data: Arc::new(CatalogData::new().into()),
         }
     }
 
-    pub fn find<'a>(&'a self, word: &'a str) -> Option<(CatalogIndex, &'a Word)> {
-        let idx = self.data.map.get(&Ascii::new(word))?;
-        Some((idx.clone(), &self.data.definitions[idx.0]))
+    pub fn find<'a>(&'a self, word: &'a str) -> Option<(CatalogIndex, Word)> {
+        self.data.lock().unwrap().find_by_string(word)
     }
 
-    pub fn get(&self, index: &CatalogIndex) -> &Word {
-        &self.data.definitions[index.0]
+    pub fn get(&self, index: &CatalogIndex) -> Word {
+        self.data.lock().unwrap().get(index)
     }
 }
 
 #[derive(Debug)]
 struct CatalogData {
-    map: HashMap<Ascii<&'static str>, CatalogIndex>,
-    definitions: Vec<Word>,
+    cache: Vec<Option<Word>>,
+    connection: rusqlite::Connection,
 }
 
 impl CatalogData {
     fn new() -> Self {
-        let mut this = Self {
-            map: HashMap::new(),
-            definitions: Vec::new(),
-        };
-
-        this.fill_with_test_data();
-        this
+        let connection = rusqlite::Connection::open("Catalog.sqlite3")
+            .expect("failed to open catalog!");
+        Self {
+            cache: Vec::new().into(),
+            connection,
+        }
     }
 
-    fn add(&mut self, word: &'static str) -> &mut Word {
-        let idx = self.map.entry(Ascii::new(word))
-            .or_insert_with(|| {
-                self.definitions.push(Word {
-                    text: word,
-                    traits: Default::default(),
-                });
-                CatalogIndex(self.definitions.len() - 1)
-            });
+    fn find_by_string(&mut self, word: &str) -> Option<(CatalogIndex, Word)> {
+        let id = self.connection.query_row(
+            "SELECT id FROM words WHERE word = (?1)",
+            [word],
+            |row| row.get(0)
+        ).ok()?;
 
-        &mut self.definitions[idx.0]
+        if self.cache.len() < id {
+            self.cache.resize_with(id, || None);
+        }
+
+        self.cache.insert(id, Some(Word{
+            text: Arc::from(word),
+            traits: self.find_traits(id).unwrap().into(),
+        }));
+
+        self.cache.get(id)?
+            .clone()
+            .map(|word| (CatalogIndex(id), word))
     }
 
-    fn fill_with_test_data(&mut self) {
-        self.add_noun("man", "mannen", Gender::Masculine);
-        self.add_noun("vrouw", "vrouwen", Gender::Feminine);
-        self.add_noun("kind", "kinderen", Gender::Neuter);
-        self.add_noun("meisje", "meisjes", Gender::Neuter);
-        self.add_noun("meid", "meiden", Gender::Feminine);
-        self.add_noun("jongen", "jongens", Gender::Masculine);
-        self.add_noun("water", "wateren", Gender::Neuter);
+    fn find_traits(&self, id: usize) -> Result<Vec<WordTrait>, Box<dyn Error>> {
+        let mut stmt = self.connection.prepare("SELECT gender, multiplicity FROM trait_noun WHERE word_id = (?1)")?;
+
+        let iter = stmt.query_map(
+            [id],
+            |row| Ok(WordTrait::Noun {
+                gender: Gender::from(row.get::<usize, u8>(0)?),
+                multiplicity: Multiplicity::from(row.get::<usize, u8>(1)?)
+            })
+        )?;
+
+        let values = iter
+            .map(|x| x.unwrap())
+            .collect::<Vec<WordTrait>>();
+
+        Ok(values)
     }
 
-    fn add_noun(
-        &mut self,
-        singular: &'static str,
-        plural: &'static str,
-        gender: Gender,
-    ) {
-
-        self.add(singular).traits.push(
-            WordTrait::Noun {
-                gender,
-                multiplicity: Multiplicity::Singular,
-            }
-        );
-
-        self.add(plural).traits.push(
-            WordTrait::Noun {
-                gender,
-                multiplicity: Multiplicity::Plural,
-            }
-        );
+    fn get(&self, catalog_index: &CatalogIndex) -> Word {
+        self.cache[catalog_index.0].clone().unwrap()
     }
 }
 

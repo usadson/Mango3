@@ -4,4 +4,5 @@ edition = "2021"
 version = "0.1.0"
 
 [dependencies]
+rusqlite = { version = "0.30.0", features = ["bundled"] }
 unicase = "*"
