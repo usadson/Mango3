@@ -52,10 +52,8 @@ async fn main() {
 
     println!("Listening on {address}");
 
-    axum::Server::bind(&address.parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(address).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
 
 #[derive(Deserialize)]
