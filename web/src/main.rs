@@ -26,6 +26,9 @@ struct AppState {
 
 #[tokio::main]
 async fn main() {
+    // Clear Screen
+    print!("\x1b[1;1H\x1b[2J");
+
     println!("Mango3 is loading...");
 
     env_logger::Builder::from_env(

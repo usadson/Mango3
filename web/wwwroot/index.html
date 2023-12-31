@@ -8,13 +8,16 @@
 </head>
 <body>
     <h1>Mango3</h1>
-    <textarea>
-
-    </textarea>
+    <h3>Tekstinvoer</h3>
+    <textarea></textarea>
     <br>
-    <output>
 
-    </output>
+    <h3>Analyse</h3>
+    <div id="output-container">
+        <output>
+
+        </output>
+    </div>
 
     <script>
         var timer;
@@ -123,6 +126,9 @@
         }
     </script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         html {
             font-family: sans-serif;
         }
@@ -155,13 +161,26 @@
             display: none;
         }
 
-        output {
-            margin-top: 1rem;
-            padding: .5rem;
+        h3 {
+            margin-bottom: 0;
+        }
+
+        textarea,
+        #output-container {
+            width: 100%;
+            height: 15rem;
+        }
+
+        #output-container {
             border: 1px solid black;
             background-color: #F0F0F0;
+        }
+
+        output {
+            padding: .8rem;
             display: block;
             width: max-content;
+            height: max-content;
         }
 
         output:empty {
