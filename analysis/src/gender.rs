@@ -115,6 +115,7 @@ impl GenderAnalyzer for Substantive {
         for trait_ in &word.traits {
             match trait_ {
                 WordTrait::Noun { gender, .. } => return gender.analyze_gender(catalog),
+                _ => continue,
             }
         }
 

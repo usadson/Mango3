@@ -2,9 +2,11 @@
 // All Rights Reserved.
 
 mod catalog;
+mod verb;
 mod word;
 
 pub use self::{
     catalog::*,
+    verb::*,
     word::*,
 };

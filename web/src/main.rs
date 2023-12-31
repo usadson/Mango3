@@ -4,17 +4,17 @@
 use std::time::Instant;
 
 use axum::{
-    extract::State,
+    extract::{State, Path},
     handler::HandlerWithoutStateExt,
     http::{StatusCode, HeaderMap},
     routing::*,
     Json,
     Router,
-    response::IntoResponse,
+    response::{IntoResponse, Html},
 };
 
 use mango3_analysis::Report;
-use mango3_catalog::Catalog;
+use mango3_catalog::{Catalog, WordTrait};
 use mango3_parser::{parse_document, Input};
 use serde::{Deserialize, Serialize};
 use tower_http::services::ServeDir;
@@ -44,6 +44,7 @@ async fn main() {
     let fallback_service = ServeDir::new("web/wwwroot").not_found_service(fallback_service);
 
     let app = Router::new()
+        .route("/info/verb/:verb", get(info_verb))
         .route("/api/v1/analyze", post(api_analyze))
         .fallback_service(fallback_service)
         .with_state(state);
@@ -85,6 +86,48 @@ async fn api_analyze(
     headers.append("Server-Timing", format!("parse;dur={parse_time}, analysis;dur={analysis_time}").try_into().unwrap());
 
     (headers, Json(AnalyzeResponsePayload { analysis }))
+}
+
+async fn info_verb(
+    State(state): State<AppState>,
+    Path(verb_query): Path<String>,
+) -> impl IntoResponse {
+    let Some((_, verb_word)) = state.catalog.find(&verb_query) else {
+        return (StatusCode::NOT_FOUND, Html("Verb not found!".into()));
+    };
+
+    let Some(WordTrait::Verb { verb }) = verb_word.traits
+            .iter()
+            .find(|x| matches!(x, WordTrait::Verb {..})) else {
+        return (StatusCode::NOT_FOUND, Html("Not a verb".into()));
+    };
+
+    let conjugations = state.catalog.find_indicative_conjugations(*verb);
+
+    let mut html = r#"
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <table class=table>
+            <thead>
+                <tr>
+                    <th>Vorm</th>
+                    <th>Waarde</th>
+                </tr>
+            </head>
+            <tbody>
+    "#.to_string();
+
+    html += &format!("<tr><td>Ik</td><td>{}</td></tr>", conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::FirstPerson, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", "));
+    html += &format!("<tr><td>Jij</td><td>{}</td></tr>", conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::SecondPersonJe, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", "));
+    html += &format!("<tr><td>U</td><td>{}</td></tr>", conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::SecondPersonU, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", "));
+    html += &format!("<tr><td>Ge</td><td>{}</td></tr>", conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::SecondPersonGe, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", "));
+    html += &format!("<tr><td>Hij/Zij</td><td>{}</td></tr>", conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::ThirdPerson, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", "));
+    let plural = conjugations.iter().filter(|x| x.is_conjugation(mango3_catalog::ConjugationKind::Plural, false)).map(|x| x.text.as_ref()).collect::<Vec<&str>>().join(", ");
+    html += &format!("<tr><td>Wij</td><td>{plural}</td></tr><tr><td>Jullie</td><td>{plural}</td></tr><tr><td>Zij</td><td>{plural}</td></tr>");
+
+    html += "</tbody></table>";
+
+
+    (StatusCode::OK, Html(html))
 }
 
 async fn handle_404() -> (StatusCode, &'static str) {

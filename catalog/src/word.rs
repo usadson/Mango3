@@ -2,6 +2,7 @@
 // All Rights Reserved.
 
 use std::sync::Arc;
+use crate::{ConjugationKind, VerbId};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Gender {
@@ -43,11 +44,36 @@ pub struct Word {
     pub traits: SharedVec<WordTrait>,
 }
 
+impl Word {
+    pub fn is_conjugation(&self, kind: ConjugationKind, is_past: bool) -> bool {
+        let query_kind = kind;
+        let query_is_past = is_past;
+
+        self.traits
+            .iter()
+            .any(|x| {
+                let WordTrait::VerbConjugationIndicative { kind, is_past, .. } = *x else {
+                    return false;
+                };
+
+                kind == query_kind && is_past == query_is_past
+            })
+    }
+}
+
 #[derive(Debug)]
 pub enum WordTrait {
     Noun {
         gender: Gender,
         multiplicity: Multiplicity,
+    },
+    Verb {
+        verb: VerbId,
+    },
+    VerbConjugationIndicative {
+        verb: VerbId,
+        kind: ConjugationKind,
+        is_past: bool,
     },
 }
 

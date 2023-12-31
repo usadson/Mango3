@@ -104,6 +104,7 @@ fn multiplicity_for_noun_core(core: &NounConstituentCore, catalog: &Catalog) -> 
             for trait_ in &catalog.get(&substantive.catalog_index).traits {
                 match trait_ {
                     WordTrait::Noun { multiplicity , .. } => return Some(*multiplicity),
+                    _ => continue,
                 }
             }
 
