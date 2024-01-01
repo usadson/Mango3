@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Tristan Gerritsen <tristan@thewoosh.org>
+// Copyright (C) 2023 - 2024 Tristan Gerritsen <tristan@thewoosh.org>
 // All Rights Reserved.
 
 use mango3_catalog::{Catalog, Multiplicity, WordTrait};
@@ -16,6 +16,7 @@ impl DeterminatorValidator {
         sink: &mut dyn AnalysisSink,
     ) {
         match &sentence.kind {
+            SentenceKind::IndependentClause(..) => todo!(),
             SentenceKind::NounConstituent(noun) => {
                 self.analyze_noun_constituent(noun, catalog, sink)
             }
